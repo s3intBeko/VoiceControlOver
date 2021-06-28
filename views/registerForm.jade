@@ -1,0 +1,19 @@
+doctype html
+html
+    head
+        title Register 
+    body
+        form(method='POST', action='register' enctype="multipart\/form-data")
+            div.form-group
+                label(for='name') Name :
+                input#name.form-control(type='text', placeholder='User Name', name='user_name')
+            div.form-group
+                labe(for='email') Email :
+                input#email.form-control(type='email', placeholder='name@name.com', name='email')
+            div.form-group
+                label(for='pw') Password :
+                input#pw.form-control(type='password' name='user_pass')
+            div.form-group
+                label(for='file') Avatar :
+                input#file.form-control(type='file' name='file')
+            button.btn.btn-primary(type='submit') Sign up!

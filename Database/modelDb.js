@@ -118,6 +118,10 @@ class ModelDb{
           payload:null
         }
       }
+    }catch(err){
+      console.error("Get Servers Error : " + err)
+      return null
+    }
 
 
   }
