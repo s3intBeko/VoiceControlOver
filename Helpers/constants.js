@@ -20,4 +20,6 @@
     ConvertMS["ONEWEEKMS"] = 604800000
     ConvertMS["ONEDAYMS"] = 86400000
     ConvertMS["ONEHOUR"] = 3600000
+    ConvertMS["TWOHOUR"] = 3600000 * 2
+    ConvertMS["THREEHOUR"] = 3600000 * 3
 })(ConvertMS = exports.ConvertMS || (exports.ConvertMS = {}));

@@ -13,7 +13,7 @@ exports.verifySigneture = (payload)=> {
         let inSig = signQuery["sign"]
         delete signQuery["sign"]
         let sig = crypto.createHash('md5').update(JSON.stringify(signQuery)+secret).digest("hex")  
-        if(Math.abs(Math.floor(Date.now() / 1000) - signQuery["ct"]) > 25) return false
+        if(Math.abs(Math.floor(Date.now() / 1000) - signQuery["ct"]) > 1125) return false
         if(inSig != sig) return false
         return true
 

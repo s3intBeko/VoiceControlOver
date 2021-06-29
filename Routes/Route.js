@@ -145,7 +145,7 @@ class Routes {
 				message: 'Poker Server Restful Service Working',
 				succeed: true
 			}))
-        
+        app.post("/NonAuthenticated/Login", this.nonAuthenticated.Login)
         app.post("/NonAuthenticated/PreAuth", this.nonAuthenticated.PreAuth)
 		// USER ROUTES	
 		app.post(`${this.apiv1}/auth`, this.userController.authenticate)

@@ -83,21 +83,26 @@ class ModelDb{
     }
   }
 
-  async userLogin(email,password){
-    const findOneQuery = 'SELECT * FROM users.players WHERE email=$1 and password=$2 LIMIT 1';
+  async userLogin(email,password,ipAdress){
+    console.log(`Email : ${email} Pwd :${password} IP : ${ipAdress}`)
+    const findOneQuery = 'SELECT * FROM users.players WHERE email=$1 and password=$2 ';
     var r = await db.query(findOneQuery,[email,password])
     if(r.rowCount < 1){
       return {
-        success:false,
-        code:2,
+        error:{
+          success:false,
+          code:2
+        },        
         payload:null
       }
     }
     let currentUser = r.rows[0]
     if(currentUser['status'] < 1){
       return {
-        success:false,
-        code:currentUser['status'] ,
+        error:{
+          success:false,
+          code:currentUser['status'] 
+        },        
         payload:null
       }
     }
@@ -113,17 +118,61 @@ class ModelDb{
         server = s.rows[0].ip + ":" + s.rows[0].port
       }else{
         return {
-          success:false,
-          code:4,
+          error:{
+            success:false,
+            code:4
+          },        
           payload:null
         }
       }
     }catch(err){
       console.error("Get Servers Error : " + err)
-      return null
+      return {
+        error:{
+          success:false,
+          code:4
+        },        
+        payload:null
+      }
+    }
+    let playerToken = signTokenGuess({
+      userId : currentUser["player_id"],
+      email : currentUser["email"],
+      ipAddress : ipAdress
+    })
+    let updatePlayerData = {
+      ip_address:ipAdress,
+      player_token:playerToken
+    }
+    //CAN BE AWAIT OR NOT ???
+    await this.userUpdateById(currentUser["player_id"],updatePlayerData)
+    return {
+      error:{
+        success:false,
+        code:0
+      },   
+      payload:{
+        userId:currentUser['player_id'],
+        signedRequest:playerToken,
+        point:server
+      }
     }
 
+  }
 
+  async userUpdateById(playerId,updateData){
+    const updateQuery = updateUsertByID(playerId,updateData)          
+    let vals = []
+    Object.values(updateData).forEach(x=>{
+      vals.push(x)
+    })
+    try{
+      var r = await db.query(updateQuery,vals)
+      return true
+    }catch(err){
+      console.error("Update Query Error : " + err)
+      return false
+    }
   }
 
   async loginUser(req,res){    

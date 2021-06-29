@@ -10,7 +10,7 @@ exports.signJWT = (payload)=> {
 };
 
 exports.signTokenGuess = (payload)=> {
-    return jsonwebtoken.sign(payload, process.env.SECRET, {expiresIn: Constants.ConvertMS.ONEWEEKMS})
+    return jsonwebtoken.sign(payload, process.env.SECRET, {expiresIn: Constants.ConvertMS.TWOHOUR})
 }
 
 exports.verifyJWT = (token) => {
