@@ -36,10 +36,10 @@ class NonAuthenticated {
                     mapping:{
                         register:"user/register",
                         login:"NonAuthenticated/Login",
-                        auth:"user/auth",
+                        auth:"Authenticated/Auth",
                         profile:"user/info",
-                        tableList:"Game/TableList",
-                        smartLobby:"Game/SmartLobby"
+                        tableList:"Authenticated/Game/TableList",
+                        smartLobby:"Authenticated/Game/SmartLobby"
     
                     }
                     
@@ -64,19 +64,7 @@ class NonAuthenticated {
                     let email = encodeURIComponent(req.body['email']).replace('%40','@')
                     let pwd = encodeURIComponent(req.body['pwd'])
                     let result = await database.userLogin(email,pwd,req.connection.remoteAddress)
-                    console.log(result)
                     return res.status(con.ResponseCodes.OK).send(result)
-                    /*if(result.success){
-                        return res.status(con.ResponseCodes.OK).send({
-                            error :{
-                                code:0,
-                                success:true
-                            },
-                            payload :result.payload
-                        })
-                    }else{
-                        return res.status(con.ResponseCodes.OK).send(result)
-                    }*/   
             }else{
                 return res.status(con.ResponseCodes.OK).send({
                     error :{

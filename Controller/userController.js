@@ -1,6 +1,6 @@
 const signJwt = require("../Helpers/signJWT")
 const con = require("../Helpers/constants")
-
+//TODO U CAN DELETE THIS 
 class UserController {
     async authenticate(_req, res){
         /*

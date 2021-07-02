@@ -7,12 +7,13 @@ exports.signApiKey = (payload)=> {
 };
 exports.verifySigneture = (payload)=> {
     const secret = process.env.APIKEY;
-    
+    console.log(payload)
     let signQuery = payload
     if(signQuery.hasOwnProperty("sign") && signQuery.hasOwnProperty("ct")){
         let inSig = signQuery["sign"]
         delete signQuery["sign"]
-        let sig = crypto.createHash('md5').update(JSON.stringify(signQuery)+secret).digest("hex")  
+        let sig = crypto.createHash('md5').update(JSON.stringify(signQuery)+secret).digest("hex")
+        console.log(sig)
         if(Math.abs(Math.floor(Date.now() / 1000) - signQuery["ct"]) > 1125) return false
         if(inSig != sig) return false
         return true

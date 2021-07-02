@@ -1,5 +1,6 @@
 const ControllerUser = require('../Controller/userController')
 const ControllerNonAuthenticated = require('../Controller/nonAuthenticated')
+const ControllerAuthenticated = require('../Controller/Authenticated')
 const Database = require('../Database/modelDb')
 const Express = require('express')
 const Path = require('path')
@@ -27,6 +28,7 @@ class Routes {
         this.apiv1 = '/api/v1';
         this.userController = new ControllerUser.UserController()
         this.nonAuthenticated = new ControllerNonAuthenticated.NonAuthenticated();
+        this.authenticated = new ControllerAuthenticated.Authenticated();
         this.database = new Database.ModelDb()
 	}
 
@@ -147,6 +149,7 @@ class Routes {
 			}))
         app.post("/NonAuthenticated/Login", this.nonAuthenticated.Login)
         app.post("/NonAuthenticated/PreAuth", this.nonAuthenticated.PreAuth)
+        app.post("/Authenticated/Auth", this.authenticated.Auth)
 		// USER ROUTES	
 		app.post(`${this.apiv1}/auth`, this.userController.authenticate)
 
