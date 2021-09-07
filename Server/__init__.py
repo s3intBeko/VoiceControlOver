@@ -7,10 +7,12 @@ import platform
 from Package.Log import Log as Logger
 from Package.Config import Config
 from Package.PyAudioParams import Params as PyParams
+from Server.ClientType import ClientType
 
 class App:
     host_name = socket.gethostname()
     _config = Config()
+
 
     def __init__(self):
         self.run = True
@@ -18,9 +20,10 @@ class App:
             self._config.read('config.cfg', 'server', 'address'),
             self._config.read('config.cfg', 'server', 'port')
         ]
+
         self.server_socket = None
-        self.read_list = None
-        self.file_list = {}
+        self.client_list = {}
+        self.read_list =[]
         Logger.write('Platform : %s' % platform.machine())
 
         Logger.write("Server Init %s " % self.server)
@@ -30,6 +33,7 @@ class App:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.server_socket.bind((self.server[0],int(self.server[1])))
+            self.read_list = [self.server_socket]
         except OSError:
             Logger.write("Already In Use")
             time.sleep(3)
@@ -41,35 +45,68 @@ class App:
         try:
             while self.run:
                 readable, writable, errored = select.select(self.read_list, [], [])
+
                 for s in readable:
                     if s is self.server_socket:
                         (clientsocket, address) = self.server_socket.accept()
-                        self.read_list.append(clientsocket)
                         print("Connection from", address)
-                        self.file_list[address] = bytearray()
+                        self.read_list.append(clientsocket)
+                        client = ClientType()
+                        client.ip_address = address
+                        client.socket = clientsocket
+                        self.client_list[address] = client
+                        #self.file_list[address] = bytearray()
                     else:
                         data = s.recv(PyParams.BufferSize)
+                        if not self.client_list[address].receiving_file:
+                            rec_msg = str(data.decode())
+                            Logger.write(rec_msg,'green')
+                            if rec_msg.startswith('n'):
+                                self.client_list[address].name = rec_msg.split(':')[1]
+                                msg = 's:success:%s' % self.client_list[address].name
+                                self.send_message(clientsocket, msg)
+                            elif rec_msg == 'a:send':
+                                self.client_list[address].receiving_file = True
+                                self.send_message(clientsocket, 's:success:waiting')
+                        else:
+                            if data[-3:] == b'\n\r\0':
+                                self.send_message(clientsocket, 's:success:handled')
+                                self.save_file(self.client_list[address].get_file())
+                                self.client_list[address].file_sent()
+                            else:
+                                self.client_list[address].file_data(data)
+
                         # print(data[-3:])
                         # save_file(data)
-                        if data[-3:] == b"\n\r\0":
-                            print("END OF FILE ")
-                            self.save_file(bytes(self.file_list[address]))
-                            self.file_list[address] = bytearray()
-                        else:
-                            self.file_list[address].extend(data)
+                        #if data[-3:] == b"\n\r\0":
+                        #    print("END OF FILE ")
+                        #    self.save_file(bytes(self.file_list[address]))
+                        #    self.file_list[address] = bytearray()
+                        #else:
+                        #    self.file_list[address].extend(data)
 
                         if not data:
-                            self.read_list.remove(s)
+                            clean = None
+                            print('Cleaning Client')
+                            for a in self.client_list.keys():
+                                if self.client_list[a].socket == s:
+                                    clean = a
+                            if clean:
+                                self.client_list.pop(a)
             pass
         except KeyboardInterrupt:
             self.run = False
             exit(1)
         finally:
             self.server_socket.close()
-
+    @staticmethod
+    def send_message(client,msg):
+        if client:
+            client.send(msg.encode())
     @staticmethod
     def save_file(data):
-        filename = 'output_' + str(int(time.time()))
+        _record_path =''# './Package/Snowboy/Recorded/'
+        filename = _record_path + 'output_' + str(int(time.time()))
         # writes data to WAV file
         #data = data  # ''.join(data)
         wf = wave.open(filename + '.wav', 'wb')

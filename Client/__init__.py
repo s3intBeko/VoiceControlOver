@@ -23,6 +23,8 @@ class App:
         self.get_models()
         self.detector = None
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.client_socket.settimeout(5)
+        self.name = 'workroom' #todo get from config
         self.server_address = (
             self._config.read('config.cfg', 'server', 'address'),
             int(self._config.read('config.cfg', 'server', 'port'))
@@ -39,6 +41,9 @@ class App:
             self.client_socket.connect(self.server_address)
             self._connected = True
             self._connect_try_counter = 0
+            time.sleep(1)
+            msg = 'n:%s' %self.name
+            self.client_socket.send(msg.encode())
         except socket.error as err:
             err_code = err.errno
             Logger.write("Socket Connection Error : %s - %s" % (err,err.errno),'red')
@@ -49,13 +54,11 @@ class App:
             raise
         if not self._connected:
             if err_code == 106:
-
                 self.client_socket.close()
-                self.client_socket.shutdown(1)
                 self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if self._connect_try > self._connect_try_counter:
                 self._connect_try_counter += 1
-                time.sleep(5)
+                time.sleep(10)
                 self.connect_socket()
             else:
                 Logger.write("Exceed Max Try")
@@ -68,7 +71,7 @@ class App:
                 try:
                     data = self.client_socket.recv(PyParams.BufferSize)
                     if data:
-                        print('There is Data :' + data)
+                        Logger.write("Received  : %s" % data.decode(),'green')
                     else:
                         Logger.write('Connection Lost Retry in 3 seconds')
                         self._connected = False
@@ -88,10 +91,12 @@ class App:
         if not self._connected:
             return
         data = [sound_bytes[i:i+PyParams.BufferSize] for i in range(0, len(sound_bytes), PyParams.BufferSize)]
-        self.client_socket.send(b'SendingFile')
-        #for d in data:
-        #    self.client_socket.send(d)
-        #self.client_socket.send(b"\n\r\0")
+        msg = 'a:send'
+        self.client_socket.send(msg.encode())
+        time.sleep(1)
+        for d in data:
+            self.client_socket.send(d)
+        self.client_socket.send(b"\n\r\0")
 
     def detected_callback(self):
         Logger.write("Wake Up")
