@@ -7,7 +7,7 @@
 import sys
 
 sys.path.append('./')
-
+print("Arm Detect Working")
 from sys import version_info as _swig_python_version_info
 if _swig_python_version_info >= (2, 7, 0):
     def swig_import_helper():
