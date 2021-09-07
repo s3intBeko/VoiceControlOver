@@ -28,7 +28,18 @@ class App:
 
     def server_stream_audio(self):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind((self.server[0],int(self.server[1])))
+        try:
+            self.server_socket.bind((self.server[0],int(self.server[1])))
+        except OSError:
+            from psutil import process_iter
+            from signal import SIGTERM  # or SIGKILL
+
+            for proc in process_iter():
+                for conns in proc.connections(kind='inet'):
+                    if conns.laddr.port == 8080:
+                        proc.send_signal(SIGTERM)
+            self.server_stream_audio()
+            return
         self.server_socket.listen(10)
         self.read_list = [self.server_socket]
         Logger.write("Server Streaming Audio %s " % self.server)
