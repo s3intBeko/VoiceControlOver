@@ -56,7 +56,8 @@ class App:
                             self.read_list.remove(s)
             pass
         except KeyboardInterrupt:
-            pass
+            self.run = False
+            exit(1)
         finally:
             self.server_socket.close()
 
@@ -75,6 +76,25 @@ class App:
 
     def start(self):
         Logger.write("Server Starting %s " % self.server)
-        t1 = threading.Thread(target=self.server_stream_audio, args=())
+        #t1 = threading.Thread(target=self.server_stream_audio, args=())
+        t1 = PropagatingThread(target=self.server_stream_audio, args=())
         t1.start()
         Logger.write("Server Started %s " % self.server)
+
+class PropagatingThread(threading.Thread):
+    def run(self):
+        self.exc = None
+        try:
+            if hasattr(self, '_Thread__target'):
+                # Thread uses name mangling prior to Python 3.
+                self.ret = self._Thread__target(*self._Thread__args, **self._Thread__kwargs)
+            else:
+                self.ret = self._target(*self._args, **self._kwargs)
+        except BaseException as e:
+            self.exc = e
+
+    def join(self, timeout=None):
+        super(PropagatingThread, self).join(timeout)
+        if self.exc:
+            raise self.exc
+        return self.ret
