@@ -8,15 +8,16 @@ import wave
 import os
 import platform
 import logging
+from Package.Log import Log as Logger
 from ctypes import *
 from contextlib import contextmanager
 from speech_recognition import AudioData
 
 if str(platform.machine()).startswith('arm'):
     from .Arm import snowboydetect
-    print("From Arm Loading.")
+    Logger.write("From Arm Loading.")
 else:
-    print("From X64 Loading.")
+    Logger.write("From X64 Loading.")
     from .x64 import snowboydetect
 
 logging.basicConfig()
@@ -24,9 +25,9 @@ logger = logging.getLogger("snowboy")
 logger.setLevel(logging.INFO)
 TOP_DIR = os.path.dirname(os.path.abspath(__file__))
 
-RESOURCE_FILE = os.path.join(TOP_DIR, "resources/common.res")
-DETECT_DING = os.path.join(TOP_DIR, "resources/ding.wav")
-DETECT_DONG = os.path.join(TOP_DIR, "resources/dong.wav")
+RESOURCE_FILE = os.path.join(TOP_DIR, "Resources/common.res")
+DETECT_DING = os.path.join(TOP_DIR, "Resources/ding.wav")
+DETECT_DONG = os.path.join(TOP_DIR, "Resources/dong.wav")
 
 
 def py_error_handler(filename, line, function, err, fmt):
