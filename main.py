@@ -9,9 +9,12 @@ _config = Config()
 if __name__ == "__main__":
     _config.check_config_file('config.cfg')
     diamond = (True, False)[str(_config.read('config.cfg', 'program', 'diamond')) == 'False']
-    apps = _config.read('config.cfg', 'program', 'workfor')
+    apps = _config.read('config.cfg', 'program', 'work')
     _logger.write('Program Starting as %s ' % apps)
     if apps == 'Server':
+        from Server import App
+        _app = App()
+        _app.start()
         pass
     elif apps == 'Client':
         pass

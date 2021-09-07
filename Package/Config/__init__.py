@@ -52,7 +52,9 @@ class Config:
         if os.path.isfile(cfg_file):
             return
         Config.write(cfg_file, 'program', 'diamond', False)
-        Config.write(cfg_file, 'program', 'workfor', "Server")
+        Config.write(cfg_file, 'program', 'work', "Server")
+        Config.write(cfg_file, 'server', 'address', "192.168.0.105")
+        Config.write(cfg_file, 'server', 'port', 2121)
 
 
         Config.write(cfg_file, 'knx', 'router_ip', "192.168.0.153")
