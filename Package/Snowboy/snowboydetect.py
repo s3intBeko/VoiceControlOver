@@ -1,18 +1,20 @@
 import platform
-
-print('Snow Boy Detect :' + platform.machine())
 platformFile = '_snowboydetect'
+print('Snow Boy Detect :' + platform.machine())
+if str(platform.machine()).startswith('arm'):
+    platformFile = '_snowboydetect_arm'
+
 
 from sys import version_info as _swig_python_version_info
 if _swig_python_version_info >= (2, 7, 0):
     def swig_import_helper():
         import importlib
         pkg = __name__.rpartition('.')[0]
-        mname = '.'.join((pkg, '_snowboydetect')).lstrip('.')
+        mname = '.'.join((pkg, platformFile)).lstrip('.')
         try:
             return importlib.import_module(mname)
         except ImportError:
-            return importlib.import_module('_snowboydetect')
+            return importlib.import_module(platformFile)
     _snowboydetect = swig_import_helper()
     del swig_import_helper
 elif _swig_python_version_info >= (2, 6, 0):
@@ -21,13 +23,13 @@ elif _swig_python_version_info >= (2, 6, 0):
         import imp
         fp = None
         try:
-            fp, pathname, description = imp.find_module('_snowboydetect', [dirname(__file__)])
+            fp, pathname, description = imp.find_module(platformFile, [dirname(__file__)])
         except ImportError:
             import _snowboydetect
             return _snowboydetect
         if fp is not None:
             try:
-                _mod = imp.load_module('_snowboydetect', fp, pathname, description)
+                _mod = imp.load_module(platformFile, fp, pathname, description)
             finally:
                 fp.close()
             return _mod
