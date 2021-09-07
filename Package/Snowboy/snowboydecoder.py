@@ -13,8 +13,10 @@ from contextlib import contextmanager
 from speech_recognition import AudioData
 
 if str(platform.machine()).startswith('arm'):
-    from .Arm import snowboydetect
+    import snowboydetect
+    print("From Arm Loading.")
 else:
+    print("From X64 Loading.")
     from .x64 import snowboydetect
 
 logging.basicConfig()
