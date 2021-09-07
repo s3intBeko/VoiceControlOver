@@ -7,7 +7,7 @@ else
     killall -9 python3
 fi
 
-git fetch origin master && git checkout -f origin/master
+git fetch origin main && git checkout -f origin/main
 
 echo "\033[1;32mgit updated\n\033[1;m"
 
