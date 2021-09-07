@@ -15,9 +15,10 @@ if __name__ == "__main__":
         from Server import App
         _app = App()
         _app.start()
-        pass
     elif apps == 'Client':
-        pass
+        from Client import App
+        _app = App()
+        _app.start()
     else:
         _logger.write('Unknown App Type..')
 

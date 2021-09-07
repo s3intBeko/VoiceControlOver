@@ -22,6 +22,7 @@ class App:
         self.read_list = None
         self.file_list = {}
         Logger.write('Platform : %s' % platform.machine())
+
         Logger.write("Server Init %s " % self.server)
         Logger.write("Params Sample Rate : %s" % PyParams.Rate)
 
