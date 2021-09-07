@@ -76,8 +76,8 @@ class App:
 
     def start(self):
         Logger.write("Server Starting %s " % self.server)
-        #t1 = threading.Thread(target=self.server_stream_audio, args=())
-        t1 = PropagatingThread(target=self.server_stream_audio, args=())
+        t1 = threading.Thread(target=self.server_stream_audio, args=())
+        #t1 = PropagatingThread(target=self.server_stream_audio, args=())
         t1.start()
         Logger.write("Server Started %s " % self.server)
 

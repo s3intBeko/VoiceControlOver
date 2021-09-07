@@ -50,6 +50,7 @@ class App:
         if not self._connected:
             if err_code == 106:
                 self.client_socket.close()
+                self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if self._connect_try > self._connect_try_counter:
                 self._connect_try_counter += 1
                 time.sleep(5)
@@ -82,6 +83,8 @@ class App:
             self.models.append('%s%s' % (self.model_path, f))
 
     def audio_recorder_callback(self, sound_bytes):
+        if not self._connected:
+            return
         data = [sound_bytes[i:i+PyParams.BufferSize] for i in range(0, len(sound_bytes), PyParams.BufferSize)]
         self.client_socket.send(b'SendingFile')
         #for d in data:
