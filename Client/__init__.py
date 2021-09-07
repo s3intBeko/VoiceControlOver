@@ -49,7 +49,9 @@ class App:
             raise
         if not self._connected:
             if err_code == 106:
+
                 self.client_socket.close()
+                self.client_socket.shutdown(1)
                 self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if self._connect_try > self._connect_try_counter:
                 self._connect_try_counter += 1

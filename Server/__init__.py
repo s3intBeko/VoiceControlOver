@@ -31,13 +31,8 @@ class App:
         try:
             self.server_socket.bind((self.server[0],int(self.server[1])))
         except OSError:
-            from psutil import process_iter
-            from signal import SIGTERM  # or SIGKILL
-
-            for proc in process_iter():
-                for conns in proc.connections(kind='inet'):
-                    if conns.laddr.port == 8080:
-                        proc.send_signal(SIGTERM)
+            Logger.write("Already In Use")
+            time.sleep(3)
             self.server_stream_audio()
             return
         self.server_socket.listen(10)
