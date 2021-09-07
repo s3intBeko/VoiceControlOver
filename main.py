@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+from Package.Log import Log
+from Package.Config import Config
+import time
+
+_logger = Log()
+_config = Config()
+
+if __name__ == "__main__":
+    _config.check_config_file('config.cfg')
+    diamond = (True, False)[str(_config.read('config.cfg', 'program', 'diamond')) == 'False']
+    apps = _config.read('config.cfg', 'program', 'workfor')
+    _logger.write('Program Starting as %s ' % apps)
+    if apps == 'Server':
+        pass
+    elif apps == 'Client':
+        pass
+    else:
+        _logger.write('Unknown App Type..')
+
+
+
