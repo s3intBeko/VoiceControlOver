@@ -2,14 +2,20 @@
 
 import collections
 import pyaudio
-from . import snowboydetect
+#from . import snowboydetect
 import time
 import wave
 import os
+import platform
 import logging
 from ctypes import *
 from contextlib import contextmanager
 from speech_recognition import AudioData
+
+if str(platform.machine()).startswith('arm'):
+    from .Arm import snowboydetect
+else:
+    from .x64 import snowboydetect
 
 logging.basicConfig()
 logger = logging.getLogger("snowboy")
