@@ -117,7 +117,8 @@ class App:
         sensitivity = self.sensitivity * len(self.models)
         t1 = threading.Thread(target=self.listen_socket, args=())
         t1.start()
-        self.detector = snowboydecoder.HotwordDetector(self.models, sensitivity=sensitivity, audio_gain=1)
+        Logger.write("Decoder Starting Sens : %s Gain : %s" % (self.sensitivity,self.gain))
+        self.detector = snowboydecoder.HotwordDetector(self.models, sensitivity=self.sensitivity, audio_gain=self.gain)
         self.detector.start(
             detected_callback=self.detected_callback,
             audio_recorder_callback=self.audio_recorder_callback,
