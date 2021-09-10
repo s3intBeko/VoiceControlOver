@@ -24,7 +24,9 @@ class App:
         self.detector = None
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.client_socket.settimeout(5)
-        self.name = 'workroom' #todo get from config
+        self.name = self._config.read('config.cfg', 'program', 'name')
+
+
         self.server_address = (
             self._config.read('config.cfg', 'server', 'address'),
             int(self._config.read('config.cfg', 'server', 'port'))
@@ -32,6 +34,9 @@ class App:
         self.sensitivity = float(self._config.read('config.cfg', 'voice', 'sensitivity'))
         if not self.sensitivity:
             self.sensitivity = 0.4
+        self.gain = float(self._config.read('config.cfg', 'voice', 'gain'))
+        if not self.sensitivity:
+            self.sensitivity = 1
         self.connect_socket()
 
     def connect_socket(self):

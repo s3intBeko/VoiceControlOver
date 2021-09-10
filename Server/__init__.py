@@ -111,8 +111,8 @@ class App:
             client.send(msg.encode())
     @staticmethod
     def save_file(data):
-        _record_path =''# './Package/Snowboy/Recorded/'
-        filename = _record_path + 'output_' + str(int(time.time()))
+        _record_path ='Package/Snowboy/Recorded/'
+        filename = _record_path + 'file_output_' + str(int(time.time()))
         # writes data to WAV file
         #data = data  # ''.join(data)
         wf = wave.open(filename + '.wav', 'wb')

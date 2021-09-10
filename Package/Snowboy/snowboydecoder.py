@@ -187,7 +187,7 @@ class HotwordDetector(object):
             channels=1,
             format=pyaudio.paInt16,
             rate=self._rate,
-            frames_per_buffer=1024,
+            frames_per_buffer=4096,
             stream_callback=audio_callback)
 
         if interrupt_check():
