@@ -8,6 +8,7 @@ from Package.Log import Log as Logger
 from Package.Config import Config
 from Package.PyAudioParams import Params as PyParams
 from Server.ClientType import ClientType
+from Package.Recognition.Google import Google
 
 class App:
     host_name = socket.gethostname()
@@ -16,6 +17,8 @@ class App:
 
     def __init__(self):
         self.run = True
+        self.google = Google()
+        self.google.feedback += self.google_reply
         self.server = [
             self._config.read('config.cfg', 'server', 'address'),
             self._config.read('config.cfg', 'server', 'port')
@@ -58,32 +61,29 @@ class App:
                         #self.file_list[address] = bytearray()
                     else:
                         data = s.recv(PyParams.BufferSize)
-                        if not self.client_list[address].receiving_file:
-                            rec_msg = str(data.decode())
-                            Logger.write(rec_msg,'green')
-                            if rec_msg.startswith('n'):
-                                self.client_list[address].name = rec_msg.split(':')[1]
-                                msg = 's:success:%s' % self.client_list[address].name
-                                self.send_message(clientsocket, msg)
-                            elif rec_msg == 'a:send':
-                                self.client_list[address].receiving_file = True
-                                self.send_message(clientsocket, 's:success:waiting')
-                        else:
-                            if data[-3:] == b'\n\r\0':
-                                self.send_message(clientsocket, 's:success:handled')
-                                self.save_file(self.client_list[address].get_file())
-                                self.client_list[address].file_sent()
+                        try:
+                            if not self.client_list[address].receiving_file:
+                                rec_msg = str(data.decode())
+                                Logger.write(rec_msg,'green')
+                                if rec_msg.startswith('n'):
+                                    self.client_list[address].name = rec_msg.split(':')[1]
+                                    msg = 's:success:%s' % self.client_list[address].name
+                                    self.send_message(clientsocket, msg)
+                                elif rec_msg == 'a:send':
+                                    self.client_list[address].receiving_file = True
+                                    self.send_message(clientsocket, 's:success:waiting')
                             else:
-                                self.client_list[address].file_data(data)
+                                if data[-3:] == b'\n\r\0':
+                                    self.send_message(clientsocket, 's:success:handled')
+                                    file_name = self.save_file(self.client_list[address].get_file())
+                                    self.client_list[address].file_sent()
+                                    self.understand_it(self.client_list[address].name, file_name)
 
-                        # print(data[-3:])
-                        # save_file(data)
-                        #if data[-3:] == b"\n\r\0":
-                        #    print("END OF FILE ")
-                        #    self.save_file(bytes(self.file_list[address]))
-                        #    self.file_list[address] = bytearray()
-                        #else:
-                        #    self.file_list[address].extend(data)
+                                else:
+                                    self.client_list[address].file_data(data)
+                        except:
+                            raise
+                            pass
 
                         if not data:
                             clean = None
@@ -93,12 +93,18 @@ class App:
                                     clean = a
                             if clean:
                                 self.client_list.pop(a)
+                            self.read_list.remove(s)
             pass
         except KeyboardInterrupt:
             self.run = False
             exit(1)
         finally:
             self.server_socket.close()
+
+
+    def google_reply(self,identifier, command, payload):
+        Logger.write('[%s] %s : %s ' %(identifier,command,payload), 'green')
+
     @staticmethod
     def send_message(client,msg):
         if client:
@@ -116,6 +122,9 @@ class App:
         wf.writeframes(data)
         wf.close()
         return filename + '.wav'
+
+    def understand_it(self,identifier, file_name):
+        self.google.recognise_file(identifier,file_name)
 
     def start(self):
         Logger.write("Server Starting %s " % self.server)
