@@ -17,6 +17,12 @@ if __name__ == "__main__":
     _logger.write('Program Starting as %s ' % apps)
     if apps == 'Server':
         from Server import App
+        try:
+            pass
+        except KeyboardInterrupt:
+            
+        except:
+            pass
         _app = App()
         _app.start()
     elif apps == 'Client':
