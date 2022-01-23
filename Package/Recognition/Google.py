@@ -22,6 +22,6 @@ class Google:
             data = r.recognize_google(audio, language='tr-tr')
             self.feedback(identify, 'Recognize', data)
         except sr.UnknownValueError:
-            self.feedback(identify, 'Error', 'Count Understand')
+            self.feedback(identify, 'Error', 'Anlayamadım')
         except sr.RequestError as e:
             self.feedback(identify, 'Error', str(e))

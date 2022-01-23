@@ -103,8 +103,24 @@ class App:
 
 
     def google_reply(self,identifier, command, payload):
+        if command == 'Recognize':
+            Logger.write("[%s] -> %s " % (identifier, payload), 'green')
+        elif command == "Error":
+            command = 's:talk:%s' % payload
+            self.send_message_to_client(identifier,command)
         Logger.write('[%s] %s : %s ' %(identifier,command,payload), 'green')
-
+    
+    def send_message_to_client(self,identifier,message):
+        Logger.write(" Send Message To [%s] -> %s " % (identifier, message), 'green')
+        current_client = None
+        for client in self.client_list:
+            if self.client_list[client].name == identifier:
+                current_client = self.client_list[client]
+                break
+        #current_client = next((client for client in self.client_list if client.name == identifier), None)
+        if current_client:
+            self.send_message(current_client.socket, message)
+            Logger.write("Client Found %s" % current_client.address)
     @staticmethod
     def send_message(client,msg):
         if client:

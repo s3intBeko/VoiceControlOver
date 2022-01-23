@@ -5,6 +5,7 @@ from Package.Log import Log as Logger
 from Package.Config import Config
 from Package.PyAudioParams import Params as PyParams
 from Package.Snowboy import snowboydecoder
+from Package.AI.Client import AI
 import os
 
 class App:
@@ -77,7 +78,9 @@ class App:
                 try:
                     data = self.client_socket.recv(PyParams.BufferSize)
                     if data:
-                        Logger.write("Received  : %s" % data.decode(),'green')
+                       #Logger.write("Received  : %s" % data.decode(),'green')
+                       AI.undestand(data.decode())
+
                     else:
                         Logger.write('Connection Lost Retry in 3 seconds')
                         self._connected = False
@@ -119,7 +122,7 @@ class App:
 
     def interrupt_callback(self):
         return self.interrupted
-
+    
     def start(self):
         sensitivity = self.sensitivity * len(self.models)
         t1 = threading.Thread(target=self.listen_socket, args=())
