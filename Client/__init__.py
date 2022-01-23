@@ -25,6 +25,7 @@ class App:
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.client_socket.settimeout(5)
         self.name = self._config.read('config.cfg', 'program', 'name')
+        self.wakeup_response = self._config.read('config.cfg', 'client', 'keyword_response')
 
 
         self.server_address = (
@@ -105,6 +106,12 @@ class App:
 
     def detected_callback(self):
         Logger.write("Wake Up")
+        if self.wakeup_response == "bip":
+            os.system("play ding.mp3  >/dev/null 2>&1")
+        elif self.wakeup_response == "talk":
+            os.system("play listenYou.mp3  >/dev/null 2>&1")
+        else:
+            pass
         #print('recording audio...', end='', flush=True)
 
     def signal_handler(self, signal, frame):
