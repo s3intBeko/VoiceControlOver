@@ -1,6 +1,7 @@
 import socket
 import signal,threading
 import time
+from Package.Talk import Talk
 from Package.Log import Log as Logger
 from Package.Config import Config
 from Package.PyAudioParams import Params as PyParams
@@ -18,11 +19,13 @@ class App:
     _connect_try = 5
     _connect_try_counter = 0
     _run = True
-
+    _ai = AI()
+    _listen = True
 
     def __init__(self):
         self.get_models()
         self.detector = None
+        self._ai.feedback += self.ai_feedback
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.client_socket.settimeout(5)
         self.name = self._config.read('config.cfg', 'program', 'name')
@@ -79,7 +82,7 @@ class App:
                     data = self.client_socket.recv(PyParams.BufferSize)
                     if data:
                        #Logger.write("Received  : %s" % data.decode(),'green')
-                       AI.undestand(data.decode())
+                       self._ai.undestand(data.decode())
 
                     else:
                         Logger.write('Connection Lost Retry in 3 seconds')
@@ -95,6 +98,15 @@ class App:
     def get_models(self):
         for f in os.listdir(self.model_path):
             self.models.append('%s%s' % (self.model_path, f))
+    
+    def ai_feedback(self,command,payload):
+        if command == 'talk':
+            self._listen = False
+            Talk.Say(payload)
+            self._listen = True
+        else:
+            Logger.write("Unknown AI command %s->%s" %(command, payload))
+
 
     def audio_recorder_callback(self, sound_bytes):
         if not self._connected:
@@ -108,6 +120,8 @@ class App:
         self.client_socket.send(b"\n\r\0")
 
     def detected_callback(self):
+        if not self._listen:
+            return
         Logger.write("Wake Up")
         if self.wakeup_response == "bip":
             os.system("play ding.mp3  >/dev/null 2>&1")

@@ -120,7 +120,6 @@ class App:
         #current_client = next((client for client in self.client_list if client.name == identifier), None)
         if current_client:
             self.send_message(current_client.socket, message)
-            Logger.write("Client Found %s" % current_client.address)
     @staticmethod
     def send_message(client,msg):
         if client:
